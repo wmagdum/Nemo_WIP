@@ -1,0 +1,29 @@
+
+models:
+  - type: main
+    engine: ollama
+    model: llama2
+    parameters:
+      base_url: http://localhost:11434
+
+
+rails:
+  input:
+    flows:
+      - generate_valid_python_code
+      - evaluate_user_code
+      - clarify_intent_if_needed
+      - validate_code
+
+  output:
+    flows:
+      - validate_code
+
+validators:
+  - name: max_length_check
+    type: length
+    parameters:
+      max_tokens: 1000
+    on_fail:
+      action: stop
+      message: "The input is too long. Please shorten it."

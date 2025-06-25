@@ -1,0 +1,93 @@
+prompts:
+  - task: is_coding_query
+    output_parser: boolean
+    content: |
+      User input: {{ user_input }}
+      
+      Does the above query ask to generate, evaluate, debug, or modify Python code?
+      Respond strictly with "True" or "False".
+
+  - task: detect_language
+    output_parser: string
+    content: |
+      Analyze the following code snippet and determine the programming language:
+      
+      {{ user_input }}
+      
+      Respond with only the language name, like "Python", "JavaScript", etc.
+
+  - task: max_length_check
+    output_parser: boolean
+    content: |
+      The user input is:
+      {{ user_input }}
+      
+      Does it contain fewer than 1000 tokens?
+      Respond with "True" if it is within the limit, otherwise "False".
+
+  - task: run_pep8_and_pac_check
+    output_parser: boolean
+    content: |
+      Evaluate the following Python code for strict compliance with both:
+      
+      ✅ **PEP-8 Standards**:
+      - 4 spaces for indentation
+      - Line length ≤ 79 characters
+      - snake_case naming for variables/functions
+      - UpperCamelCase for classes
+      - Proper imports order (standard, third-party, local)
+      - Use `is` for `None` comparisons
+      - Add docstrings for classes and functions
+      
+      ✅ **PAC (Panasonic Aero Coding) Standards**:
+      - Descriptive function and variable names
+      - Use constants instead of hardcoded values
+      - No global variables
+      - Graceful error handling via try/except
+      - Use logging, not print()
+      - Single-responsibility for functions
+      - Type annotations for all inputs/outputs
+      - Inline comments for non-obvious logic
+      
+      --- Code ---
+      {{ code }}
+      --------------
+
+      Respond strictly with "True" if the code complies with both, else "False".
+
+  - task: generate_compliant_code
+    output_parser: code
+    content: |
+      Write production-grade Python code that:
+      - Follows PEP-8 formatting standards (4-space indentation, < 80-char lines)
+      - Uses snake_case naming, docstrings, proper imports
+      - Complies with PAC standards (no hardcoded credentials, uses logging, strong error handling, input/output type hints)
+
+      Task description:
+      {{ user_input }}
+
+      Output only a valid Python code block. Do not include explanations.
+
+  - task: convert_to_python_if_needed
+    output_parser: code
+    content: |
+      Below is a code snippet. If it's written in a language other than Python, convert it to equivalent Python code.
+      The converted code must fully comply with:
+
+      ✅ **PEP-8**
+      - 4-space indentation, ≤ 79-char lines
+      - snake_case naming, ordered imports, clear structure
+
+      ✅ **PAC**
+      - No globals or hardcoded values
+      - Use constants and logging
+      - Descriptive naming and type hints
+      - Inline comments and graceful error handling
+
+      --- Input Code ---
+      {{ user_input }}
+      ------------------
+
+      Output only valid, compliant Python code. No extra comments or explanation.
+
+ 
