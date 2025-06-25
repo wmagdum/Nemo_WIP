@@ -1,0 +1,71 @@
+# === USER INTENTS ===
+define user ask for python coding task
+  "write python function"
+  "generate python code"
+  "can you write python script"
+  "evaluate this python code"
+  "modify this python function"
+  "check this python code"
+
+# === BOT RESPONSES ===
+define bot ask python_only_query
+  "Please provide a Python-related coding query only."
+
+define bot refuse non_python
+  "Sorry, I can only evaluate or generate Python code at the moment."
+
+define bot refuse invalid_code
+  "The code does not meet PEP-8 and PAC compliance."
+
+define bot input too long
+  "The input is too long. Please shorten it."
+
+define bot ask clarify_intent
+  "I'm not sure how to help with that. Can you clarify if this is a Python coding task?"
+
+define bot respond code
+  $code
+
+# === FLOW: Clarify Intent if Needed (used as a flow only)
+define flow clarify_intent_if_needed
+  $is_coding = execute is_coding_query
+  if not $is_coding
+    bot ask python_only_query
+    stop
+
+# === FLOW: Validate Python Code (Reusable)
+define flow validate_code
+  $is_valid = execute run_pep8_and_pac_check(code=$code)
+  if not $is_valid
+    bot refuse invalid_code
+    stop
+
+  bot respond code
+  stop
+
+# === FLOW: Generate and Validate Python Code
+define flow generate_valid_python_code
+  run flow clarify_intent_if_needed
+
+  $length_ok = execute max_length_check
+  if not $length_ok
+    bot input too long
+    stop
+
+  $code = execute generate_compliant_code
+  run flow validate_code
+
+# === FLOW: Evaluate User-Supplied Code
+define flow evaluate_user_code
+  $length_ok = execute max_length_check
+  if not $length_ok
+    bot input too long
+    stop
+
+  $language = execute detect_language
+  if $language != "Python"
+    bot refuse non_python
+    stop
+
+  $code = $user_input
+  run flow validate_code
